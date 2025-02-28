@@ -1,0 +1,7 @@
+Jenkins джоба находится в папках CMS/ATOM_NETBOX
+Jenkins джоба имеет наименование AtomNetbox_SetGitlabTag
+Агент подключен так, что домашняя директория /jenkins
+При вытаскивании переменных в .groovy файле использовалось sh "printenv | sort"
+
+WORKSPACE=/jenkins/workspace/CMS/ATOM_NETBOX/AtomNetbox_SetGitlabTag
+WORKSPACE_TMP=/jenkins/workspace/CMS/ATOM_NETBOX/AtomNetbox_SetGitlabTag@tmp
