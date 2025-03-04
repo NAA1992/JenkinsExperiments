@@ -81,6 +81,13 @@ pipeline {
                         echo "AGAIN TRY, WITH OTHER QUOTES: ${DEV_SREDA}"
                         echo "MAYBE THIS WORK? '${DEV_SREDA}'"
                     ''' // ${DEV_SREDA} printed as is, $DEV_SREDA - nothing, AGAIN - nothing, MAYBE - nothing
+                    sh """
+                        echo 'sh command with two quotes'
+                        echo 'two quotes DEV_SREDA IS ${DEV_SREDA}'
+                        echo $DEV_SREDA
+                        echo "two quotes AGAIN TRY, WITH OTHER QUOTES: ${DEV_SREDA}"
+                        echo "two quotes MAYBE THIS WORK? '${DEV_SREDA}'"
+                    """ // ${DEV_SREDA} printed as is, $DEV_SREDA - nothing, AGAIN - nothing, MAYBE - nothing
                     // echo $DEV_SREDA // ERROR
                     // echo ${DEV_SREDA} // ERROR
                     echo 'OK, one quotes: $DEV_SREDA' // print AS IS
