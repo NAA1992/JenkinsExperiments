@@ -70,6 +70,15 @@ pipeline {
                     echo "${DEV_SREDA}" // dev
                     echo "Original value shell_param_dev is ${shell_param_dev}" // dev
                     echo "Print env.NOT_EXISTS env: ${env.NOT_EXISTS}" // output: null
+                    echo """echo 'Содержится в DEV, SHELL_PARAM = "${DEV_SREDA}" ' """
+                    echo 'Содержится в DEV, SHELL_PARAM = "${DEV_SREDA}" // one quote'
+                    echo """echo "Содержится в DEV, SHELL_PARAM = '${DEV_SREDA}' " // changed quotes"""
+                    echo "Содержится в DEV, SHELL_PARAM = '${DEV_SREDA}' "
+                    sh '''
+                        echo 'sh command'
+                        echo 'DEV_SREDA IS ${DEV_SREDA}
+                        echo $DEV_SREDA
+                    '''
                     echo sh(script: 'env|sort', returnStdout: true)
                 }
             }
