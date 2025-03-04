@@ -6,7 +6,7 @@ def AllowedBranchesAsList() {
 }
 
 pipeline {
-    agent { label "uzel" }
+    agent { label "${AGENT}" }
 
     options {
         skipDefaultCheckout(false)

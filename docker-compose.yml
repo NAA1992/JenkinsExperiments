@@ -1,6 +1,7 @@
 services:
   jenkins:
-    image: jenkins/jenkins:2.499-jdk17
+    image: jenkins/jenkins:2.452.1-jdk17
+    container_name: local_jenkins
     ports:
       - "9090:8080"
       - "50000:50000"
@@ -15,7 +16,7 @@ services:
 
 volumes:
   jenkins_home:
-#    external: true
+    external: true
     name: jenkins_home
 
 networks:
