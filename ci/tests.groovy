@@ -15,6 +15,7 @@ pipeline {
         skipDefaultCheckout(false)
     }
 
+    // parameters includes into Environment
     parameters {
         booleanParam(name: 'checkoutIntoVar', defaultValue: true, description: 'Присваиваем ли переменной checkoutResult результат команды checkout scm?')
         string(name: 'Enable_Breake_Stage', defaultValue: 'YES', description: 'Enable Break Stage', trim: true)
@@ -34,12 +35,23 @@ pipeline {
             }
             steps {
                 script {
-                    echo sh(script: 'env|sort', returnStdout: true)
                     echo "Try print each ENV_NAME, ENV_VALUE"
-                    def sys_env = System.getenv()
-                    sys_env.each{
-                        println it
-                    } 
+                    // Записываем все переменные окружения в файл env.txt
+                    sh 'env > env.txt'
+
+                    // Читаем файл и обрабатываем каждую строку
+                    for (String line : readFile('env.txt').split("\r?\n")) {
+                        // Разбиваем строку по символу '='
+                        def split = line.split('=', 2) // Ограничиваем split до 2 частей
+
+                        // Проверяем, что строка была успешно разбита
+                        if (split.size() == 2) {
+                            def envName = split[0]
+                            def envValue = split[1]
+                            println "env_name: ${envName} env_val: ${envValue}"
+                        } else {
+                            println "Invalid line: ${line}"
+                        }
                     // echo "Try get value by name. Example, HOME"
                     // BELOW CODE IS ERROR
                     //HOME_VAR = env.get("HOME")
