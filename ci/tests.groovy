@@ -108,10 +108,10 @@ pipeline {
                         if (env.gitlabTargetBranch != null) {
                             // классно, продолжаем работу
                         } else {
-                            gitlabTargetBranch = env.GIT_BRANCH
+                            def gitlabTargetBranch = env.GIT_BRANCH
                         }
                     } catch (MissingPropertyException e) {
-                        gitlabTargetBranch = env.GIT_BRANCH
+                        def gitlabTargetBranch = env.GIT_BRANCH
                         }
                     catchError(buildResult: 'ABORTED', stageResult: 'ABORTED') {
                         def gitlabTargetBranch = gitlabTargetBranch.split("/")[-1]
