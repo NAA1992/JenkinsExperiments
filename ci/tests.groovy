@@ -49,6 +49,7 @@ pipeline {
                         } else {
                             println "Invalid line: ${line}"
                         }
+                    }
                     
                     // echo "Try get value by name. Example, HOME"
                     // BELOW CODE IS ERROR
