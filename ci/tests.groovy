@@ -34,19 +34,23 @@ pipeline {
             }
             steps {
                 script {
+                    echo sh(script: 'env|sort', returnStdout: true)
                     echo "Try print each ENV_NAME, ENV_VALUE"
-                    env.each{
-                        echo "${it}"
-                        }
-                    echo "Try get value by name. Example, HOME"
+                    def sys_env = System.getenv()
+                    sys_env.each{
+                        println it
+                    } 
+                    // echo "Try get value by name. Example, HOME"
                     // BELOW CODE IS ERROR
                     //HOME_VAR = env.get("HOME")
                     // And if variable not exists (because of upper) it will be error
                     //echo "${HOME_VAR}"
                     echo "Try change env TRY_TO_CHANGE_ME"
-                    env.TRY_TO_CHANGE_ME = 'CHANGED_VALUE'
-                    echo "${env.TRY_TO_CHANGE_ME}"
-                    echo "${TRY_TO_CHANGE_ME}"
+                    // So not changed
+                    //env.TRY_TO_CHANGE_ME = 'CHANGED_VALUE'
+                    TRY_TO_CHANGE_ME = 'CHANGED_VALUE'
+                    echo "env.TRY_TO_CHANGE_ME = ${env.TRY_TO_CHANGE_ME}"
+                    echo "TRY_TO_CHANGE_ME = ${TRY_TO_CHANGE_ME}"
                     echo "Try create global env GLOBAL_ENV_BREAK with value from param Enable_Breake_Stage"
                     GLOBAL_ENV_BREAK="${params.get('Enable_Breake_Stage')}"
                     echo "${GLOBAL_ENV_BREAK}"
@@ -54,7 +58,7 @@ pipeline {
                     DEV_SREDA = "${shell_param_dev}"
                     echo "${DEV_SREDA}"
                     echo "Original value shell_param_dev is ${shell_param_dev}"
-                    echo "Print env.NOT_EXISTS env: ${env.NOT_EXISTS}"
+                    echo "Print env.NOT_EXISTS env: ${env.NOT_EXISTS}" // output: null
                     echo sh(script: 'env|sort', returnStdout: true)
                 }
             }
