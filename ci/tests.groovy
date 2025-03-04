@@ -69,6 +69,8 @@ pipeline {
                     echo "Try create global env GLOBAL_ENV_BREAK with value from param Enable_Breake_Stage"
                     GLOBAL_ENV_BREAK="${params.get('Enable_Breake_Stage')}" // YES
                     echo "GLOBAL_ENV_BREAK is ${GLOBAL_ENV_BREAK}" // YES
+                    ONE_MORE_WAY_TO_GET_FROM_PARAM = "$params.get('Enable_Breake_Stage')"
+                    echo "$ONE_MORE_WAY_TO_GET_FROM_PARAM"
                     echo "Try to create env DEV_SREDA with value from variable shell_param_dev"
                     DEV_SREDA = "${shell_param_dev}" // dev
                     echo "${DEV_SREDA}" // dev
