@@ -22,7 +22,6 @@ pipeline {
         ENV_FILE=".env.example"
         DEVELOPMENT_BRANCHES = "development, copy-jenkins-branch" // можно указывать через запятую, например "test, dev, qa"
         PROD_BRANCHES = 'main'
-        SHELL_PARAM = ''
     }
 
     stages {
@@ -33,7 +32,7 @@ pipeline {
             steps {
                 script {
                     echo "Create var shell_param (value = shell_param_dev)"
-                    env.SHELL_PARAM="${params.get('shell_param_dev')}"
+                    env.SHELL_PARAM=params.get('shell_param_dev')
                     echo "${env.SHELL_PARAM}"
                     echo "Directly get param (checkoutIntoVar)"
                     echo "${params.get('checkoutIntoVar')}"
