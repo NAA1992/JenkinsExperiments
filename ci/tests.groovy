@@ -1,6 +1,8 @@
 // Глобальная функция для получения списка разрешенных веток
-def getAllowedBranches() {
-    return BRANCHES_ALLOWED_FOR_WORK.split(',').collect { it.trim() } // Убираем пробелы
+def AllowedBranchesAsList() {
+    // return DEVELOPMENT_BRANCHES.split(',').collect { it.trim() }
+    env.DEVELOPMENT_BRANCHES = DEVELOPMENT_BRANCHES.split(',').collect { it.trim() } // Убираем пробелы
+    env.PROD_BRANCHES = PROD_BRANCHES.split(',').collect { it.trim() } // Убираем пробелы
 }
 
 pipeline {
@@ -12,50 +14,42 @@ pipeline {
 
     parameters {
         booleanParam(name: 'checkoutIntoVar', defaultValue: true, description: 'Присваиваем ли переменной checkoutResult результат команды checkout scm?')
+        string(defaultValue: 'dev', description: 'Argument for shell command DEV stand', name: 'shell_param_dev', trim: true)
+        string(defaultValue: 'prod', description: 'Argument for shell command PROD stand', name: 'shell_param_prod', trim: true)
     }
-    
+
     environment {
         ENV_FILE=".env.example"
-        BRANCHES_ALLOWED_FOR_WORK = 'copy-jenkins-branch, Jenkins_ATOM-1095, development, main'
+        DEVELOPMENT_BRANCHES = "development, copy-jenkins-branch" // можно указывать через запятую, например "test, dev, qa"
+        PROD_BRANCHES = 'main'
     }
 
     stages {
         stage('Print params') {
-            steps {
-                script {
-                    echo "print only 1 param"
-                    def shell_param = params.get("checkoutIntoVar")
-                    echo "${shell_param}"
-                    echo "${params.get('checkoutIntoVar')}"
-                    params.each { param_key, param_value ->
-                        echo "Ключ: ${param_key}, Значение: ${param_value}"
-                    }
-                    params.each {param ->
-                        echo "param.key: ${param.key}"
-                        echo "param.value: ${param.value}"
-                    }
-                }
-            }
-        }
-        stage('PrAllEnv') {
-            steps {
-                script {
-                    echo sh(script: 'env|sort', returnStdout: true)
-                }
-            }
-        }
-        
-        stage('NOT EXISTS env') {
             when {
                 expression {"${currentBuild.currentResult}" == 'SUCCESS'}
             }
             steps {
                 script {
-                    echo "NOT EXISTS IS ${env.EXISTS}"
+                    echo "Create var shell_param (value = shell_param_dev)"
+                    def shell_param = params.get("shell_param_dev")
+                    echo "${shell_param}"
+                    echo "Directly get param (checkoutIntoVar)"
+                    echo "${params.get('checkoutIntoVar')}"
+                    echo "Each param print"
+                    params.each { param_key, param_value ->
+                        echo "Ключ: ${param_key}, Значение: ${param_value}"
+                    }
+                    /* Other way to print each param
+                    params.each {param ->
+                        echo "param.key: ${param.key}"
+                        echo "param.value: ${param.value}"
+                    }
+                    */
                 }
             }
         }
-        stage('set env JUSTKEY') {
+        stage('Set New Env (ME_EXISTS)') {
             when {
                 anyOf {
                     expression { params.checkoutIntoVar == true }
@@ -64,11 +58,32 @@ pipeline {
             }
             steps {
                 script {
-                        env.JUSTKEY='JUSTVAL'
+                        env.ME_EXISTS='YES, OF COURSE'
                     }
                     
                 }
+        }
+        stage('PrAllEnv') {
+            when {
+                anyOf {
+                    expression { currentBuild.result == 'SUCCESS' } // here is null
+                    expression { currentBuild.currentResult == 'SUCCESS' }
+                }
             }
+            steps {
+                script {
+                    echo "Print from previous stage var shell_param"
+                    sh "echo ${shell_param}"
+                    echo "Print from previos ENV var (ME_EXISTS)"
+                    echo "NOT EXISTS IS ${env.ME_EXISTS}"
+                    echo "Try print environment var, who is not exists"
+                    echo "NOT EXISTS IS ${env.ME_NOT_EXISTS}"
+                    echo "print all env"
+                    echo sh(script: 'env|sort', returnStdout: true)
+                }
+            }
+        }
+        
         stage('CheckoutSCM into var') {
             when {
                 allOf {
@@ -89,13 +104,27 @@ pipeline {
             }
             steps {
                 script {
+                    try {
+                        if (gitlabTargetBranch != null) {
+                            // классно, продолжаем работу
+                        } else {
+                            gitlabTargetBranch = env.GIT_BRANCH
+                        }
+                    } catch (MissingPropertyException e) {
+                        gitlabTargetBranch = env.GIT_BRANCH
+                        }
                     catchError(buildResult: 'ABORTED', stageResult: 'ABORTED') {
-                        env.gitlabTargetBranch = "Jenkins_ATOM-1095"
+                        def gitlabTargetBranch = gitlabTargetBranch.split("/")[-1]
                         echo "Проверяем, что gitlabTargetBranch = ${gitlabTargetBranch}"
-                        allowedBranches = getAllowedBranches()
-                        echo "Содержится в этом списке: ${allowedBranches.join(';')}"
-                        if (allowedBranches.contains(gitlabTargetBranch)) {
-                            echo 'Да, все так, продолжаем работу'
+                        AllowedBranchesAsList()
+                        echo "Содержится в списке, обозначенный как DEV: ${DEVELOPMENT_BRANCHES.join(';')}"
+                        echo "Или же в обозначенном как PROD: ${PROD_BRANCHES.join(';')}"
+                        if (DEVELOPMENT_BRANCHES.contains(gitlabTargetBranch)) {
+                            def shell_param = params.get("shell_param_dev")
+                            echo 'Содержится в DEV'
+                        } else if (PROD_BRANCHES.contains(gitlabTargetBranch)) {
+                            def shell_param = params.get("shell_param_prod")
+                            echo 'Содержится в PROD'
                         } else {
                             error('Прервано, т.к. Merge был произведен в другую ветвь')
                         }
@@ -109,6 +138,8 @@ pipeline {
             }
             steps {
                 script {
+                    echo "Try print shell_param"
+                    sh "echo ${shell_param}"
                     catchError(buildResult: 'ABORTED', stageResult: 'ABORTED') {
                         if (1==1) {
                             error('Next прерван, выполнение остановлено.')
