@@ -35,14 +35,11 @@ pipeline {
             }
             steps {
                 script {
+                    /* Scripts not permitted to use staticMethod java.lang.System getenv
                     echo "Try print each ENV_NAME, ENV_VALUE"
-                    // Записываем все переменные окружения в файл env.txt
                     sh 'env > env.txt'
-
-                    // Читаем файл и обрабатываем каждую строку
                     for (String line : readFile('env.txt').split("\r?\n")) {
-                        // Разбиваем строку по символу '='
-                        def split = line.split('=', 2) // Ограничиваем split до 2 частей
+                        def split = line.split('=', 2)
 
                         // Проверяем, что строка была успешно разбита
                         if (split.size() == 2) {
@@ -52,6 +49,7 @@ pipeline {
                         } else {
                             println "Invalid line: ${line}"
                         }
+                    */
                     // echo "Try get value by name. Example, HOME"
                     // BELOW CODE IS ERROR
                     //HOME_VAR = env.get("HOME")
