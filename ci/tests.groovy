@@ -96,7 +96,7 @@ pipeline {
                     // echo ${DEV_SREDA} // ERROR
                     echo 'OK, one quotes: $DEV_SREDA' // print AS IS
                     echo "OK, two quotes: $DEV_SREDA" // changes
-                    echo "We added env CHANGE_ME_VIA_ENVIRONMENTS, check that value changed: $CHANGE_ME_VIA_ENVIRONMENTS"
+                    echo "We added env CHANGE_ME_VIA_ENVIRONMENTS, check that value changed: $CHANGE_ME_VIA_ENVIRONMENTS" // CHANGED_VALUE, but not forever
                     echo sh(script: 'env|sort', returnStdout: true)
                 }
             }
@@ -107,7 +107,7 @@ pipeline {
             }
             steps {
                 script {
-                    echo "Previous stage changed CHANGE_ME_VIA_ENVIRONMENTS, check that: $CHANGE_ME_VIA_ENVIRONMENTS"
+                    echo "Previous stage changed CHANGE_ME_VIA_ENVIRONMENTS, check that: $CHANGE_ME_VIA_ENVIRONMENTS" // DEFAULT_VALUE
                     echo "Check, that environments from previous stage is saved"
                     echo "GLOBAL_ENV_BREAK = ${GLOBAL_ENV_BREAK}" // YES
                     echo "env.TRY_TO_CHANGE_ME  = ${env.TRY_TO_CHANGE_ME}" // DEFAULT_VALUE
