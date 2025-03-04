@@ -35,7 +35,7 @@ pipeline {
             }
             steps {
                 script {
-                    /* Scripts not permitted to use staticMethod java.lang.System getenv */
+                    /* IT's allowed via file, but slowly
                     echo "Try print each ENV_NAME, ENV_VALUE"
                     sh 'env > env.txt'
                     for (String line : readFile('env.txt').split("\r?\n")) {
@@ -50,7 +50,7 @@ pipeline {
                             println "Invalid line: ${line}"
                         }
                     }
-                    
+                    */
                     // echo "Try get value by name. Example, HOME"
                     // BELOW CODE IS ERROR
                     //HOME_VAR = env.get("HOME")

@@ -2,6 +2,8 @@ services:
   jenkins:
     image: jenkins/jenkins:2.452.1-jdk17
     container_name: local_jenkins
+    environment:
+      TZ: "Europe/Moscow"
     ports:
       - "9090:8080"
       - "50000:50000"
