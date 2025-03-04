@@ -1,8 +1,8 @@
 // Глобальная функция для получения списка разрешенных веток
 def AllowedBranchesAsList() {
     // return DEVELOPMENT_BRANCHES.split(',').collect { it.trim() }
-    env.DEVELOPMENT_BRANCHES = env.DEVELOPMENT_BRANCHES.split(',').collect { it.trim() } // Убираем пробелы
-    env.PROD_BRANCHES = env.PROD_BRANCHES.split(',').collect { it.trim() } // Убираем пробелы
+    DEVELOPMENT_BRANCHES = env.DEVELOPMENT_BRANCHES.split(',').collect { it.trim() } // Убираем пробелы
+    PROD_BRANCHES = env.PROD_BRANCHES.split(',').collect { it.trim() } // Убираем пробелы
 }
 
 pipeline {
@@ -105,7 +105,7 @@ pipeline {
             steps {
                 script {
                     try {
-                        if (gitlabTargetBranch != null) {
+                        if (env.gitlabTargetBranch != null) {
                             // классно, продолжаем работу
                         } else {
                             gitlabTargetBranch = env.GIT_BRANCH
