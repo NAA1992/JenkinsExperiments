@@ -1,8 +1,8 @@
 // Глобальная функция для получения списка разрешенных веток
 def AllowedBranchesAsList() {
     // return DEVELOPMENT_BRANCHES.split(',').collect { it.trim() }
-    env.DEVELOPMENT_BRANCHES = DEVELOPMENT_BRANCHES.split(',').collect { it.trim() } // Убираем пробелы
-    env.PROD_BRANCHES = PROD_BRANCHES.split(',').collect { it.trim() } // Убираем пробелы
+    env.DEVELOPMENT_BRANCHES = env.DEVELOPMENT_BRANCHES.split(',').collect { it.trim() } // Убираем пробелы
+    env.PROD_BRANCHES = env.PROD_BRANCHES.split(',').collect { it.trim() } // Убираем пробелы
 }
 
 pipeline {
@@ -33,7 +33,7 @@ pipeline {
             steps {
                 script {
                     echo "Create var shell_param (value = shell_param_dev)"
-                    sh 'export SHELL_PARAM=${params.get("shell_param_dev")}'
+                    sh "export SHELL_PARAM=${params.get('shell_param_dev')}"
                     echo "${env.SHELL_PARAM}"
                     echo "Directly get param (checkoutIntoVar)"
                     echo "${params.get('checkoutIntoVar')}"
