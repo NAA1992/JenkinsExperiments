@@ -33,7 +33,7 @@ pipeline {
             steps {
                 script {
                     echo "Create var shell_param (value = shell_param_dev)"
-                    sh "export SHELL_PARAM=${params.get('shell_param_dev')}"
+                    env.SHELL_PARAM="${params.get('shell_param_dev')}"
                     echo "${env.SHELL_PARAM}"
                     echo "Directly get param (checkoutIntoVar)"
                     echo "${params.get('checkoutIntoVar')}"
