@@ -78,7 +78,10 @@ pipeline {
                         echo 'sh command'
                         echo 'DEV_SREDA IS ${DEV_SREDA}'
                         echo $DEV_SREDA
-                    '''
+                        echo "AGAIN TRY, WITH OTHER QUOTES: ${DEV_SREDA}"
+                    ''' // ${DEV_SREDA} printed as is, $DEV_SREDA - nothing
+                    echo $DEV_SREDA
+                    echo '$DEV_SREDA'
                     echo sh(script: 'env|sort', returnStdout: true)
                 }
             }
