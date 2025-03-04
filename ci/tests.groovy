@@ -26,10 +26,14 @@ pipeline {
         DEVELOPMENT_BRANCHES = "development, copy-jenkins-branch" // можно указывать через запятую, например "test, dev, qa"
         PROD_BRANCHES = 'main'
         TRY_TO_CHANGE_ME = 'DEFAULT_VALUE'
+        CHANGE_ME_VIA_ENVIRONMENTS = 'DEFAULT_VALUE'
     }
 
     stages {
         stage('Environments') {
+            environment {
+                CHANGE_ME_VIA_ENVIRONMENTS = 'CHANGED_VALUE'
+            }
             when {
                 expression {"${currentBuild.currentResult}" == 'SUCCESS'}
             }
@@ -87,11 +91,12 @@ pipeline {
                         echo $DEV_SREDA
                         echo "two quotes AGAIN TRY, WITH OTHER QUOTES: ${DEV_SREDA}"
                         echo "two quotes MAYBE THIS WORK? '${DEV_SREDA}'"
-                    """ // ${DEV_SREDA} printed as is, $DEV_SREDA - nothing, AGAIN - nothing, MAYBE - nothing
+                    """ // ALWAYS CHANGED !!!
                     // echo $DEV_SREDA // ERROR
                     // echo ${DEV_SREDA} // ERROR
                     echo 'OK, one quotes: $DEV_SREDA' // print AS IS
                     echo "OK, two quotes: $DEV_SREDA" // changes
+                    echo "We added env CHANGE_ME_VIA_ENVIRONMENTS, check that value changed: $CHANGE_ME_VIA_ENVIRONMENTS"
                     echo sh(script: 'env|sort', returnStdout: true)
                 }
             }
@@ -102,6 +107,7 @@ pipeline {
             }
             steps {
                 script {
+                    echo "Previous stage changed CHANGE_ME_VIA_ENVIRONMENTS, check that: $CHANGE_ME_VIA_ENVIRONMENTS"
                     echo "Check, that environments from previous stage is saved"
                     echo "GLOBAL_ENV_BREAK = ${GLOBAL_ENV_BREAK}" // YES
                     echo "env.TRY_TO_CHANGE_ME  = ${env.TRY_TO_CHANGE_ME}" // DEFAULT_VALUE
