@@ -23,4 +23,5 @@ volumes:
 
 networks:
     cicd_network:
+        name: jenkins_network
         driver: bridge
