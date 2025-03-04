@@ -22,6 +22,7 @@ pipeline {
         ENV_FILE=".env.example"
         DEVELOPMENT_BRANCHES = "development, copy-jenkins-branch" // можно указывать через запятую, например "test, dev, qa"
         PROD_BRANCHES = 'main'
+        SHELL_PARAM = ''
     }
 
     stages {
@@ -32,8 +33,8 @@ pipeline {
             steps {
                 script {
                     echo "Create var shell_param (value = shell_param_dev)"
-                    def shell_param = params.get("shell_param_dev")
-                    echo "${shell_param}"
+                    def env.SHELL_PARAM = params.get("shell_param_dev")
+                    echo "${env.SHELL_PARAM}"
                     echo "Directly get param (checkoutIntoVar)"
                     echo "${params.get('checkoutIntoVar')}"
                     echo "Each param print"
@@ -73,7 +74,7 @@ pipeline {
             steps {
                 script {
                     echo "Print from previous stage var shell_param"
-                    sh "echo ${shell_param}"
+                    sh "echo ${env.SHELL_PARAM}"
                     echo "Print from previos ENV var (ME_EXISTS)"
                     echo "NOT EXISTS IS ${env.ME_EXISTS}"
                     echo "Try print environment var, who is not exists"
@@ -120,10 +121,10 @@ pipeline {
                         echo "Содержится в списке, обозначенный как DEV: ${DEVELOPMENT_BRANCHES.join(';')}"
                         echo "Или же в обозначенном как PROD: ${PROD_BRANCHES.join(';')}"
                         if (DEVELOPMENT_BRANCHES.contains(gitlabTargetBranch)) {
-                            def shell_param = params.get("shell_param_dev")
+                            def env.SHELL_PARAM = params.get("shell_param_dev")
                             echo 'Содержится в DEV'
                         } else if (PROD_BRANCHES.contains(gitlabTargetBranch)) {
-                            def shell_param = params.get("shell_param_prod")
+                            def env.SHELL_PARAM = params.get("shell_param_prod")
                             echo 'Содержится в PROD'
                         } else {
                             error('Прервано, т.к. Merge был произведен в другую ветвь')
@@ -139,7 +140,7 @@ pipeline {
             steps {
                 script {
                     echo "Try print shell_param"
-                    sh "echo ${shell_param}"
+                    sh "echo ${env.SHELL_PARAM}"
                     catchError(buildResult: 'ABORTED', stageResult: 'ABORTED') {
                         if (1==1) {
                             error('Next прерван, выполнение остановлено.')
