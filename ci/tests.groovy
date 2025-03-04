@@ -32,8 +32,8 @@ pipeline {
             steps {
                 script {
                     echo "Create var shell_param (value = shell_param_dev)"
-                    env.SHELL_PARAM=params.get('shell_param_dev')
-                    echo "${env.SHELL_PARAM}"
+                    SHELL_PARAM=params.get('shell_param_dev')
+                    echo "${SHELL_PARAM}"
                     echo "Directly get param (checkoutIntoVar)"
                     echo "${params.get('checkoutIntoVar')}"
                     echo "Each param print"
@@ -73,7 +73,7 @@ pipeline {
             steps {
                 script {
                     echo "Print from previous stage var shell_param"
-                    sh "echo ${env.SHELL_PARAM}"
+                    sh "echo ${SHELL_PARAM}"
                     echo "Print from previos ENV var (ME_EXISTS)"
                     echo "NOT EXISTS IS ${env.ME_EXISTS}"
                     echo "Try print environment var, who is not exists"
@@ -105,13 +105,11 @@ pipeline {
             steps {
                 script {
                     try {
-                        if (env.gitlabTargetBranch != null) {
-                            // классно, продолжаем работу
-                        } else {
-                            def gitlabTargetBranch = env.GIT_BRANCH
+                        if (gitlabTargetBranch == null) {
+                            gitlabTargetBranch = env.GIT_BRANCH
                         }
                     } catch (MissingPropertyException e) {
-                        def gitlabTargetBranch = env.GIT_BRANCH
+                        gitlabTargetBranch = env.GIT_BRANCH
                         }
                     catchError(buildResult: 'ABORTED', stageResult: 'ABORTED') {
                         def gitlabTargetBranch = gitlabTargetBranch.split("/")[-1]
@@ -120,10 +118,10 @@ pipeline {
                         echo "Содержится в списке, обозначенный как DEV: ${DEVELOPMENT_BRANCHES.join(';')}"
                         echo "Или же в обозначенном как PROD: ${PROD_BRANCHES.join(';')}"
                         if (DEVELOPMENT_BRANCHES.contains(gitlabTargetBranch)) {
-                            env.SHELL_PARAM = params.get("shell_param_dev")
+                            SHELL_PARAM = params.get("shell_param_dev")
                             echo 'Содержится в DEV'
                         } else if (PROD_BRANCHES.contains(gitlabTargetBranch)) {
-                            env.SHELL_PARAM = params.get("shell_param_prod")
+                            SHELL_PARAM = params.get("shell_param_prod")
                             echo 'Содержится в PROD'
                         } else {
                             error('Прервано, т.к. Merge был произведен в другую ветвь')
@@ -139,7 +137,7 @@ pipeline {
             steps {
                 script {
                     echo "Try print shell_param"
-                    sh "echo ${env.SHELL_PARAM}"
+                    sh "echo ${SHELL_PARAM}"
                     catchError(buildResult: 'ABORTED', stageResult: 'ABORTED') {
                         if (1==1) {
                             error('Next прерван, выполнение остановлено.')
