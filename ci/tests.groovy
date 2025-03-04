@@ -33,7 +33,7 @@ pipeline {
             steps {
                 script {
                     echo "Create var shell_param (value = shell_param_dev)"
-                    def env.SHELL_PARAM = params.get("shell_param_dev")
+                    env.SHELL_PARAM = params.get("shell_param_dev")
                     echo "${env.SHELL_PARAM}"
                     echo "Directly get param (checkoutIntoVar)"
                     echo "${params.get('checkoutIntoVar')}"
@@ -121,10 +121,10 @@ pipeline {
                         echo "Содержится в списке, обозначенный как DEV: ${DEVELOPMENT_BRANCHES.join(';')}"
                         echo "Или же в обозначенном как PROD: ${PROD_BRANCHES.join(';')}"
                         if (DEVELOPMENT_BRANCHES.contains(gitlabTargetBranch)) {
-                            def env.SHELL_PARAM = params.get("shell_param_dev")
+                            env.SHELL_PARAM = params.get("shell_param_dev")
                             echo 'Содержится в DEV'
                         } else if (PROD_BRANCHES.contains(gitlabTargetBranch)) {
-                            def env.SHELL_PARAM = params.get("shell_param_prod")
+                            env.SHELL_PARAM = params.get("shell_param_prod")
                             echo 'Содержится в PROD'
                         } else {
                             error('Прервано, т.к. Merge был произведен в другую ветвь')
