@@ -36,12 +36,13 @@ pipeline {
                 script {
                     echo "Try print each ENV_NAME, ENV_VALUE"
                     env.each{
-                        println it
+                        echo "${it}"
                         }
                     echo "Try get value by name. Example, HOME"
                     // BELOW CODE IS ERROR
                     //HOME_VAR = env.get("HOME")
-                    echo "${HOME_VAR}"
+                    // And if variable not exists (because of upper) it will be error
+                    //echo "${HOME_VAR}"
                     echo "Try change env TRY_TO_CHANGE_ME"
                     env.TRY_TO_CHANGE_ME = 'CHANGED_VALUE'
                     echo "${env.TRY_TO_CHANGE_ME}"
@@ -53,7 +54,6 @@ pipeline {
                     DEV_SREDA = "${shell_param_dev}"
                     echo "${DEV_SREDA}"
                     echo "Original value shell_param_dev is ${shell_param_dev}"
-                    echo "Print NOT_EXISTS env: ${NOT_EXISTS}"
                     echo "Print env.NOT_EXISTS env: ${env.NOT_EXISTS}"
                     echo sh(script: 'env|sort', returnStdout: true)
                 }
