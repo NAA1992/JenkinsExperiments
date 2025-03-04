@@ -58,16 +58,16 @@ pipeline {
                     echo "Try change env TRY_TO_CHANGE_ME"
                     // So not changed
                     //env.TRY_TO_CHANGE_ME = 'CHANGED_VALUE'
-                    TRY_TO_CHANGE_ME = 'CHANGED_VALUE'
-                    echo "env.TRY_TO_CHANGE_ME = ${env.TRY_TO_CHANGE_ME}"
-                    echo "TRY_TO_CHANGE_ME = ${TRY_TO_CHANGE_ME}"
+                    TRY_TO_CHANGE_ME = 'CHANGED_VALUE' // yes, it change and you must use without env. prefix
+                    echo "env.TRY_TO_CHANGE_ME = ${env.TRY_TO_CHANGE_ME}" // DEFAULT_VALUE
+                    echo "TRY_TO_CHANGE_ME = ${TRY_TO_CHANGE_ME}" // CHANGED_VALUE
                     echo "Try create global env GLOBAL_ENV_BREAK with value from param Enable_Breake_Stage"
-                    GLOBAL_ENV_BREAK="${params.get('Enable_Breake_Stage')}"
-                    echo "${GLOBAL_ENV_BREAK}"
+                    GLOBAL_ENV_BREAK="${params.get('Enable_Breake_Stage')}" // YES
+                    echo "GLOBAL_ENV_BREAK is ${GLOBAL_ENV_BREAK}" // YES
                     echo "Try to create env DEV_SREDA with value from variable shell_param_dev"
-                    DEV_SREDA = "${shell_param_dev}"
-                    echo "${DEV_SREDA}"
-                    echo "Original value shell_param_dev is ${shell_param_dev}"
+                    DEV_SREDA = "${shell_param_dev}" // dev
+                    echo "${DEV_SREDA}" // dev
+                    echo "Original value shell_param_dev is ${shell_param_dev}" // dev
                     echo "Print env.NOT_EXISTS env: ${env.NOT_EXISTS}" // output: null
                     echo sh(script: 'env|sort', returnStdout: true)
                 }
@@ -80,9 +80,9 @@ pipeline {
             steps {
                 script {
                     echo "Check, that environments from previous stage is saved"
-                    echo "GLOBAL_ENV_BREAK = ${GLOBAL_ENV_BREAK}"
-                    echo "env.TRY_TO_CHANGE_ME  = ${env.TRY_TO_CHANGE_ME}"
-                    echo "TRY_TO_CHANGE_ME = ${TRY_TO_CHANGE_ME}"
+                    echo "GLOBAL_ENV_BREAK = ${GLOBAL_ENV_BREAK}" // YES
+                    echo "env.TRY_TO_CHANGE_ME  = ${env.TRY_TO_CHANGE_ME}" // DEFAULT_VALUE
+                    echo "TRY_TO_CHANGE_ME = ${TRY_TO_CHANGE_ME}" // CHANGED_VALUE
                     echo "Each param print"
                     params.each { param_key, param_value ->
                         echo "Param Key: ${param_key}, Param Value: ${param_value}"
@@ -168,7 +168,7 @@ pipeline {
             }
             steps {
                 script {
-                    echo "HOME IS ${env.HOME}"
+                    echo "env.HOME IS ${env.HOME}"
                 }
             }
         }
