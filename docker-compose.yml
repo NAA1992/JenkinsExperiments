@@ -1,0 +1,23 @@
+services:
+  jenkins:
+    image: jenkins/jenkins:2.499-jdk17
+    ports:
+      - "9090:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    user: root
+    restart: on-failure:5 
+    networks:
+      - cicd_network
+
+
+volumes:
+  jenkins_home:
+#    external: true
+    name: jenkins_home
+
+networks:
+    cicd_network:
+        driver: bridge
