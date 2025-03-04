@@ -35,11 +35,14 @@ pipeline {
             steps {
                 script {
                     echo "Try print each ENV_NAME, ENV_VALUE"
-                    env.each { env_key, env_value ->
+                    def envMap = env.getEnvironment()
+                    envMap.each { env_key, env_value ->
                         echo "Environment variable: ${env_key} = ${env_value}"
                     }
+                    
                     echo "Try get value by name. Example, HOME"
-                    HOME_VAR = env.get("HOME")
+                    // BELOW CODE IS ERROR
+                    //HOME_VAR = env.get("HOME")
                     echo "${HOME_VAR}"
                     echo "Try change env TRY_TO_CHANGE_ME"
                     env.TRY_TO_CHANGE_ME = 'CHANGED_VALUE'
