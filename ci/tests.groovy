@@ -82,7 +82,7 @@ pipeline {
                         echo "MAYBE THIS WORK? '${DEV_SREDA}'"
                     ''' // ${DEV_SREDA} printed as is, $DEV_SREDA - nothing, AGAIN - nothing, MAYBE - nothing
                     // echo $DEV_SREDA // ERROR
-                    echo ${DEV_SREDA} 
+                    // echo ${DEV_SREDA} // ERROR
                     echo 'OK, one quotes: $DEV_SREDA' // print AS IS
                     echo "OK, two quotes: $DEV_SREDA" // changes
                     echo sh(script: 'env|sort', returnStdout: true)
