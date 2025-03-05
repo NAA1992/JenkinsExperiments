@@ -114,8 +114,9 @@ pipeline {
                     // Если внутри shell скрипта env переопределяется, то оно и будет использоваться (переопределенное)
                     echo "makeshell.sh print-tenant"
                     sh "./makeshell.sh print-tenant" // выведет содержимое .env.example
-                    echo "From env Enable_Breake_Stage: $env.Enable_Breake_Stage"
-                    echo "From param: Enable_Breake_Stage:  $param.Enable_Breake_Stage"
+                    echo "From env Enable_Breake_Stage: $env.Enable_Breake_Stage" // like in ENV
+                    echo "From param: Enable_Breake_Stage:  $params.Enable_Breake_Stage"
+                    echo "From param: Enable_Breake_Stage: ${param.get('Enable_Breake_Stage')}"
                     echo "Just Enable_Breake_Stage: $Enable_Breake_Stage"
                     Enable_Breake_Stage = "ANY OTHER"
                     echo "We tried change Enable_Breake_Stage, value: $Enable_Breake_Stage"
