@@ -22,6 +22,7 @@ def determineAgent() {
 // глобальные переменные для SHELL команды 
 shell_param_dev = "dev"
 shell_param_prod = "prod"
+CONFLICT_WITH_GLOBAL = "GLOBAL"
 
 pipeline {
 
@@ -39,6 +40,7 @@ pipeline {
     parameters {
         booleanParam(name: 'checkoutIntoVar', defaultValue: true, description: 'Присваиваем ли переменной checkoutResult результат команды checkout scm?')
         string(name: 'Enable_Breake_Stage', defaultValue: 'YES', description: 'Enable Break Stage', trim: true)
+        string(name: 'CONFLICT_WITH_GLOBAL', defaultValue: 'PARAM', description: 'Enable Break Stage', trim: true)
         // string(name: 'AGENT', defaultValue: 'localhost', description: 'Agent (host, computer) where runs groovy', trim: true)
     }
 
@@ -50,6 +52,7 @@ pipeline {
         CHANGE_ME_VIA_ENVIRONMENTS = 'DEFAULT_VALUE'
         TENANT = 'hz_kakoy'
         Enable_Breake_Stage = "NO" // подсвечивается как параметр, посмотрим что изменится
+        CONFLICT_WITH_GLOBAL = 'ENV'
     }
 
     stages {
@@ -83,6 +86,9 @@ pipeline {
                     //HOME_VAR = env.get("HOME")
                     // And if variable not exists (because of upper) it will be error
                     //echo "${HOME_VAR}"
+                    echo "Just CONFLICT_WITH_GLOBAL is $CONFLICT_WITH_GLOBAL"
+                    CONFLICT_WITH_GLOBAL = "Stage 1"
+                    echo "Changed CONFLICT_WITH_GLOBAL is $CONFLICT_WITH_GLOBAL"
                     echo "Try change env TRY_TO_CHANGE_ME"
                     // So not changed
                     //env.TRY_TO_CHANGE_ME = 'CHANGED_VALUE'
@@ -148,11 +154,12 @@ pipeline {
                 script {
                     echo "Previous stage changed CHANGE_ME_VIA_ENVIRONMENTS, check that: $CHANGE_ME_VIA_ENVIRONMENTS" // DEFAULT_VALUE
                     echo "Check, that environments from previous stage is saved"
+                    echo "CONFLICT_WITH_GLOBAL = $CONFLICT_WITH_GLOBAL"
                     echo "GLOBAL_ENV_BREAK = ${GLOBAL_ENV_BREAK}" // YES
-                    sh "echo 'GLOBAL_ENV_BREAK = $GLOBAL_ENV_BREAK'"
+                    sh "echo 'GLOBAL_ENV_BREAK = $GLOBAL_ENV_BREAK'" // YES
                     echo "env.TRY_TO_CHANGE_ME  = ${env.TRY_TO_CHANGE_ME}" // DEFAULT_VALUE
                     echo "TRY_TO_CHANGE_ME = ${TRY_TO_CHANGE_ME}" // CHANGED_VALUE
-                    echo "Enable_Breake_Stage = $Enable_Breake_Stage"
+                    echo "Enable_Breake_Stage = $Enable_Breake_Stage" // ANY_OTHER (changed from previous stage)
                     echo "Each param print"
                     params.each { param_key, param_value ->
                         echo "Param Key: ${param_key}, Param Value: ${param_value}"
