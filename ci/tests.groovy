@@ -15,12 +15,13 @@ pipeline {
     options {
         skipDefaultCheckout(false)
     }
+    
 
     // parameters includes into Environment
     parameters {
         booleanParam(name: 'checkoutIntoVar', defaultValue: true, description: 'Присваиваем ли переменной checkoutResult результат команды checkout scm?')
         string(name: 'Enable_Breake_Stage', defaultValue: 'YES', description: 'Enable Break Stage', trim: true)
-        string(name: 'AGENT_as_param', defaultValue: 'cms-netbox-dev', description: 'Agent (host, computer) where runs groovy', trim: true)
+        string(name: 'AGENT_as_param', defaultValue: 'localhost', description: 'Agent (host, computer) where runs groovy', trim: true)
     }
 
     environment {
@@ -30,6 +31,7 @@ pipeline {
         TRY_TO_CHANGE_ME = 'DEFAULT_VALUE'
         CHANGE_ME_VIA_ENVIRONMENTS = 'DEFAULT_VALUE'
         TENANT = 'hz_kakoy'
+        Enable_Breake_Stage = "NO" // подсвечивается как параметр, посмотрим что изменится
     }
 
     stages {
@@ -109,7 +111,12 @@ pipeline {
                     echo "OK, two quotes: $DEV_SREDA" // changes
                     echo "We added env CHANGE_ME_VIA_ENVIRONMENTS, check that value changed: $CHANGE_ME_VIA_ENVIRONMENTS" // CHANGED_VALUE, but not forever
                     echo sh(script: 'env|sort', returnStdout: true)
-                    sh "./makeshell.sh" // посмотрим что за TENANT выведет - Jenkins'a или взятый из .env.example
+                    // Если внутри shell скрипта env переопределяется, то оно и будет использоваться (переопределенное)
+                    echo "makeshell.sh print-tenant"
+                    sh "./makeshell.sh print-tenant" // выведет содержимое .env.example
+                    echo "Just Enable_Breake_Stage: $Enable_Breake_Stage and from env: $env.Enable_Breake_Stage and from param: $param.Enable_Breake_Stage"
+                    Enable_Breake_Stage = "ANY OTHER"
+                    echo "We tried change Enable_Breake_Stage, value: $Enable_Breake_Stage"
                 }
             }
         }
@@ -124,6 +131,7 @@ pipeline {
                     echo "GLOBAL_ENV_BREAK = ${GLOBAL_ENV_BREAK}" // YES
                     echo "env.TRY_TO_CHANGE_ME  = ${env.TRY_TO_CHANGE_ME}" // DEFAULT_VALUE
                     echo "TRY_TO_CHANGE_ME = ${TRY_TO_CHANGE_ME}" // CHANGED_VALUE
+                    echo "Enable_Breake_Stage = $Enable_Breake_Stage"
                     echo "Each param print"
                     params.each { param_key, param_value ->
                         echo "Param Key: ${param_key}, Param Value: ${param_value}"

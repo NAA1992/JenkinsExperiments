@@ -23,7 +23,7 @@ else
     exit 1
 fi
 
-echo "$TENANT"
+
 # MARK: usage
 function usage {
     cat << EOF
@@ -59,6 +59,9 @@ else
     exit 1
 fi
 
+print-tenant() {
+    echo "$TENANT"
+}
 # MARK: prepare-pgadmin
 # Готовит pgadmin. Создает папку для последующего прокидывания в контейнер
 # Так же помещает туда файл с паролем от pgadmin
