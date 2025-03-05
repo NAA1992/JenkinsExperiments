@@ -23,6 +23,7 @@ else
     exit 1
 fi
 
+echo "$TENANT"
 # MARK: usage
 function usage {
     cat << EOF

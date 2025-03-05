@@ -5,11 +5,12 @@ def AllowedBranchesAsList() {
     PROD_BRANCHES = env.PROD_BRANCHES.split(',').collect { it.trim() } // Убираем пробелы
 }
 
-shell_param_dev = "dev" // глобальная переменная DEV среды () 
+// глобальные переменные для SHELL команды 
+shell_param_dev = "dev"
 shell_param_prod = "prod"
 
 pipeline {
-    agent { label "${AGENT}" }
+    agent { label AGENT_as_param }
 
     options {
         skipDefaultCheckout(false)
@@ -19,14 +20,16 @@ pipeline {
     parameters {
         booleanParam(name: 'checkoutIntoVar', defaultValue: true, description: 'Присваиваем ли переменной checkoutResult результат команды checkout scm?')
         string(name: 'Enable_Breake_Stage', defaultValue: 'YES', description: 'Enable Break Stage', trim: true)
+        string(name: 'AGENT_as_param', defaultValue: 'cms-netbox-dev', description: 'Agent (host, computer) where runs groovy', trim: true)
     }
 
     environment {
         ENV_FILE=".env.example"
-        DEVELOPMENT_BRANCHES = "development, copy-jenkins-branch" // можно указывать через запятую, например "test, dev, qa"
+        DEVELOPMENT_BRANCHES = "development, jenkins-branch" // можно указывать через запятую, например "test, dev, qa"
         PROD_BRANCHES = 'main'
         TRY_TO_CHANGE_ME = 'DEFAULT_VALUE'
         CHANGE_ME_VIA_ENVIRONMENTS = 'DEFAULT_VALUE'
+        TENANT = 'hz_kakoy'
     }
 
     stages {
@@ -84,12 +87,14 @@ pipeline {
                     echo 'Содержится в DEV, SHELL_PARAM = "${DEV_SREDA}" // one quote' // PRINT AS IS
                     echo """echo "Содержится в DEV, SHELL_PARAM = '${DEV_SREDA}' " // changed quotes""" // in echo DEV_SREDA changes
                     echo "Содержится в DEV, SHELL_PARAM = '${DEV_SREDA}' " // in echo DEV_SREDA changes
+                    echo "That's works: $DEV_SREDA"
                     sh '''
                         echo 'sh command'
                         echo 'DEV_SREDA IS ${DEV_SREDA}'
                         echo $DEV_SREDA
                         echo "AGAIN TRY, WITH OTHER QUOTES: ${DEV_SREDA}"
                         echo "MAYBE THIS WORK? '${DEV_SREDA}'"
+                        echo 'THAT EXACTLY WORKS: "${DEV_SREDA}"'
                     ''' // ${DEV_SREDA} printed as is, $DEV_SREDA - nothing, AGAIN - nothing, MAYBE - nothing
                     sh """
                         echo 'sh command with two quotes'
@@ -104,6 +109,7 @@ pipeline {
                     echo "OK, two quotes: $DEV_SREDA" // changes
                     echo "We added env CHANGE_ME_VIA_ENVIRONMENTS, check that value changed: $CHANGE_ME_VIA_ENVIRONMENTS" // CHANGED_VALUE, but not forever
                     echo sh(script: 'env|sort', returnStdout: true)
+                    sh "./makeshell.sh" // посмотрим что за TENANT выведет - Jenkins'a или взятый из .env.example
                 }
             }
         }
