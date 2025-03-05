@@ -97,7 +97,7 @@ pipeline {
                         echo "AGAIN TRY, WITH OTHER QUOTES: ${DEV_SREDA}"
                         echo "MAYBE THIS WORK? '${DEV_SREDA}'"
                         echo 'THAT EXACTLY WORKS: "${DEV_SREDA}"'
-                    ''' // ${DEV_SREDA} printed as is, $DEV_SREDA - nothing, AGAIN - nothing, MAYBE - nothing
+                    ''' // ${DEV_SREDA} printed as is, $DEV_SREDA - nothing, AGAIN - nothing, MAYBE - nothing, EXACTLY - as is
                     sh """
                         echo 'sh command with two quotes'
                         echo 'two quotes DEV_SREDA IS ${DEV_SREDA}'
@@ -114,7 +114,9 @@ pipeline {
                     // Если внутри shell скрипта env переопределяется, то оно и будет использоваться (переопределенное)
                     echo "makeshell.sh print-tenant"
                     sh "./makeshell.sh print-tenant" // выведет содержимое .env.example
-                    echo "Just Enable_Breake_Stage: $Enable_Breake_Stage and from env: $env.Enable_Breake_Stage and from param: $param.Enable_Breake_Stage"
+                    echo "From env Enable_Breake_Stage: $env.Enable_Breake_Stage"
+                    echo "From param: Enable_Breake_Stage:  $param.Enable_Breake_Stage"
+                    echo "Just Enable_Breake_Stage: $Enable_Breake_Stage"
                     Enable_Breake_Stage = "ANY OTHER"
                     echo "We tried change Enable_Breake_Stage, value: $Enable_Breake_Stage"
                 }
