@@ -1,0 +1,19 @@
+[Unit]
+Description=Jenkins Agent Localhost
+After=network.target
+
+Requires=network.target
+
+
+[Service]
+Type=simple
+# optional file to provide environment variables (e.g. http_proxy, https_proxy):
+#EnvironmentFile=/etc/sysconfig/jenkins
+# TODO: adapt -jnlpUrl und -secret, as found on the web GUI: Jenkins > Nodes > ...
+ExecStart=java -jar /home/alex/agent.jar -url http://localhost:9090/ -secret 57ce8498966216a2ee7ccda2c1dea83f2811431f1d1312abc440c190630e0dd6 -name "remote_agent" -workDir "/jenkins"
+Restart=always
+User=alex
+RestartSec=20
+
+[Install]
+WantedBy=multi-user.targe1t

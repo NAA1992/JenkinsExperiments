@@ -163,14 +163,14 @@ update-local-release() {
     echo "Редактирование LOCAL release.yaml завершено"
 }
 
-#MARK: 
+#MARK:
 down() {
     echo "$ENV_FILE"
     docker compose --env-file "$ENV_FILE" down
 }
 
 up() {
-    local sreda=${1:-"not_dev"} 
+    local sreda=${1:-"not_dev"}
     prepare-atom
     prepare-pgadmin
     update-environment
@@ -230,7 +230,6 @@ find-up-version-patch-and-minor() {
 
 upgrade-version() {
     local sreda=${1:-""}
-    find-up-version-patch-and-minor
     if [[ "$sreda" == "dev" ]]; then
         VERSION_ATOM=$UP_VER_PATCH
         echo "среда $sreda , поднимаем версию патча $VERSION_ATOM"

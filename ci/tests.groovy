@@ -19,7 +19,7 @@ def determineAgent() {
     }
 }
 
-// глобальные переменные для SHELL команды 
+// глобальные переменные для SHELL команды
 shell_param_dev = "dev"
 shell_param_prod = "prod"
 CONFLICT_WITH_GLOBAL = "GLOBAL"
@@ -34,7 +34,7 @@ pipeline {
     options {
         skipDefaultCheckout(false)
     }
-    
+
 
     // parameters includes into Environment
     parameters {

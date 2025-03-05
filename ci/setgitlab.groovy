@@ -2,7 +2,7 @@
 
 // Ссылка на issues по gitlab plugin
 // https://github.com/jenkinsci/gitlab-plugin/issues?q=is%3Aissue%20%20tag%20
-// Ссылка на триггеры 
+// Ссылка на триггеры
 // https://www.jenkins.io/doc/pipeline/steps/params/pipelinetriggers/
 // триггеры добавляются внутри pipeline, но они же заменяют триггеры установленные в Jenkins
 /*
@@ -30,7 +30,7 @@
 // pipeline generator
 // https://jenkinspipelinegenerator.octopus.com/#/
 
-// глобальные переменные для SHELL команды 
+// глобальные переменные для SHELL команды
 shell_param_dev = "dev"
 shell_param_prod = "prod"
 
