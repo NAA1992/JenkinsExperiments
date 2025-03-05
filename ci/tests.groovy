@@ -39,7 +39,7 @@ pipeline {
     parameters {
         booleanParam(name: 'checkoutIntoVar', defaultValue: true, description: 'Присваиваем ли переменной checkoutResult результат команды checkout scm?')
         string(name: 'Enable_Breake_Stage', defaultValue: 'YES', description: 'Enable Break Stage', trim: true)
-        string(name: 'AGENT_as_param', defaultValue: 'localhost', description: 'Agent (host, computer) where runs groovy', trim: true)
+        // string(name: 'AGENT', defaultValue: 'localhost', description: 'Agent (host, computer) where runs groovy', trim: true)
     }
 
     environment {
