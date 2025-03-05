@@ -8,12 +8,12 @@ def AllowedBranchesAsList() {
 // Определяем агента. В приоритете - из параметра, потом из Environment, а затем уже агент DEFAULT_AGENT
 // Позже я переделал. DEFAULT_AGENT'a не будет - будет ошибка
 def determineAgent() {
-    if (params.AGENT != null) {
+    if (params.AGENT != null && params.AGENT != "") {
         return params.AGENT
-    } else if (env.AGENT != null) {
+    } else if (env.AGENT != null && env.AGENT != "") {
         return env.AGENT
     } else {
-        error('Прервано, т.к. ни переменной, ни параметра AGENT не существует')
+        error('Прервано, т.к. ни переменной, ни параметра AGENT не существует или они пустые')
         echo "DEFAULT_AGENT"
         return "DEFAULT_AGENT"
     }
@@ -29,6 +29,7 @@ pipeline {
     // Приоритет - environment, затем param, а затем ошибка будет если не установлено
     // А мне нужно было наоборот реализовать - в приоритете сначала param, поэтому отдельная функция
     // agent { label AGENT_as_param }
+    // Метки внутри Jenkins должны быть без запятой, просто через пробел
     agent { label determineAgent() }
 
     options {
@@ -86,9 +87,9 @@ pipeline {
                     //HOME_VAR = env.get("HOME")
                     // And if variable not exists (because of upper) it will be error
                     //echo "${HOME_VAR}"
-                    echo "Just CONFLICT_WITH_GLOBAL is $CONFLICT_WITH_GLOBAL"
+                    echo "Just CONFLICT_WITH_GLOBAL is $CONFLICT_WITH_GLOBAL" // GLOBAL
                     CONFLICT_WITH_GLOBAL = "Stage 1"
-                    echo "Changed CONFLICT_WITH_GLOBAL is $CONFLICT_WITH_GLOBAL"
+                    echo "Changed CONFLICT_WITH_GLOBAL is $CONFLICT_WITH_GLOBAL" // Stage 1
                     echo "Try change env TRY_TO_CHANGE_ME"
                     // So not changed
                     //env.TRY_TO_CHANGE_ME = 'CHANGED_VALUE'
@@ -154,7 +155,7 @@ pipeline {
                 script {
                     echo "Previous stage changed CHANGE_ME_VIA_ENVIRONMENTS, check that: $CHANGE_ME_VIA_ENVIRONMENTS" // DEFAULT_VALUE
                     echo "Check, that environments from previous stage is saved"
-                    echo "CONFLICT_WITH_GLOBAL = $CONFLICT_WITH_GLOBAL"
+                    echo "CONFLICT_WITH_GLOBAL = $CONFLICT_WITH_GLOBAL" // Stage 1
                     echo "GLOBAL_ENV_BREAK = ${GLOBAL_ENV_BREAK}" // YES
                     sh "echo 'GLOBAL_ENV_BREAK = $GLOBAL_ENV_BREAK'" // YES
                     echo "env.TRY_TO_CHANGE_ME  = ${env.TRY_TO_CHANGE_ME}" // DEFAULT_VALUE
