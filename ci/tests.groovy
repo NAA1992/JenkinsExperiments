@@ -5,12 +5,30 @@ def AllowedBranchesAsList() {
     PROD_BRANCHES = env.PROD_BRANCHES.split(',').collect { it.trim() } // Убираем пробелы
 }
 
+// Определяем агента. В приоритете - из параметра, потом из Environment, а затем уже агент DEFAULT_AGENT
+// Позже я переделал. DEFAULT_AGENT'a не будет - будет ошибка
+def determineAgent() {
+    if (params.AGENT != null) {
+        return params.AGENT
+    } else if (env.AGENT != null) {
+        return env.AGENT
+    } else {
+        error('Прервано, т.к. ни переменной, ни параметра AGENT не существует')
+        echo "DEFAULT_AGENT"
+        return "DEFAULT_AGENT"
+    }
+}
+
 // глобальные переменные для SHELL команды 
 shell_param_dev = "dev"
 shell_param_prod = "prod"
 
 pipeline {
-    agent { label AGENT_as_param }
+
+    // Приоритет - environment, затем param, а затем ошибка будет если не установлено
+    // А мне нужно было наоборот реализовать - в приоритете сначала param, поэтому отдельная функция
+    // agent { label AGENT_as_param }
+    agent { label determineAgent() }
 
     options {
         skipDefaultCheckout(false)
@@ -115,10 +133,10 @@ pipeline {
                     echo "makeshell.sh print-tenant"
                     sh "./makeshell.sh print-tenant" // выведет содержимое .env.example
                     echo "From env Enable_Breake_Stage: $env.Enable_Breake_Stage" // like in ENV
-                    echo "From param: Enable_Breake_Stage:  $params.Enable_Breake_Stage"
-                    echo "Just Enable_Breake_Stage: $Enable_Breake_Stage"
+                    echo "From param: Enable_Breake_Stage:  $params.Enable_Breake_Stage" // like in params
+                    echo "Just Enable_Breake_Stage: $Enable_Breake_Stage" // like in ENV (!!!) ENV UPPER THAN PARAMS (!!!)
                     Enable_Breake_Stage = "ANY OTHER"
-                    echo "We tried change Enable_Breake_Stage, value: $Enable_Breake_Stage"
+                    echo "We tried change Enable_Breake_Stage, value: $Enable_Breake_Stage" // Yes, it's changed and changed in other stages
                 }
             }
         }
@@ -131,6 +149,7 @@ pipeline {
                     echo "Previous stage changed CHANGE_ME_VIA_ENVIRONMENTS, check that: $CHANGE_ME_VIA_ENVIRONMENTS" // DEFAULT_VALUE
                     echo "Check, that environments from previous stage is saved"
                     echo "GLOBAL_ENV_BREAK = ${GLOBAL_ENV_BREAK}" // YES
+                    sh "echo 'GLOBAL_ENV_BREAK = $GLOBAL_ENV_BREAK'"
                     echo "env.TRY_TO_CHANGE_ME  = ${env.TRY_TO_CHANGE_ME}" // DEFAULT_VALUE
                     echo "TRY_TO_CHANGE_ME = ${TRY_TO_CHANGE_ME}" // CHANGED_VALUE
                     echo "Enable_Breake_Stage = $Enable_Breake_Stage"

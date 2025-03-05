@@ -30,29 +30,46 @@
 // pipeline generator
 // https://jenkinspipelinegenerator.octopus.com/#/
 
+// глобальные переменные для SHELL команды 
+shell_param_dev = "dev"
+shell_param_prod = "prod"
+
 // Глобальная функция для получения списка разрешенных веток
 def AllowedBranchesAsList() {
     // return DEVELOPMENT_BRANCHES.split(',').collect { it.trim() }
-    env.DEVELOPMENT_BRANCHES = DEVELOPMENT_BRANCHES.split(',').collect { it.trim() } // Убираем пробелы
-    env.PROD_BRANCHES = PROD_BRANCHES.split(',').collect { it.trim() } // Убираем пробелы
+    DEVELOPMENT_BRANCHES = DEVELOPMENT_BRANCHES.split(',').collect { it.trim() } // Убираем пробелы ['development', 'ATOM-697']
+    PROD_BRANCHES = PROD_BRANCHES.split(',').collect { it.trim() } // Убираем пробелы
+}
+
+// Определяем агента. В приоритете - из параметра, потом из Environment, а затем уже агент DEFAULT_AGENT
+def determineAgent() {
+    if (params.AGENT != null) {
+        return params.AGENT
+    } else if (env.AGENT != null) {
+        return env.AGENT
+    } else {
+        error('Прервано, т.к. ни переменной, ни параметра AGENT не существует')
+        echo "DEFAULT_AGENT"
+        return "DEFAULT_AGENT"
+    }
 }
 
 pipeline {
-    agent { label "${AGENT}" }
+    agent { label determineAgent() }
 
     options {
         skipDefaultCheckout(false)
     }
     environment {
         ENV_FILE=".env.example"
-        DEVELOPMENT_BRANCHES = "development, copy-jenkins-branch" // можно указывать через запятую, например "test, dev, qa"
+        DEVELOPMENT_BRANCHES = "development" // можно указывать через запятую, например "test, dev, qa"
         PROD_BRANCHES = 'main'
     }
 
-    parameters {
-        string(defaultValue: 'dev', description: 'Argument for shell command DEV stand', name: 'shell_param_dev', trim: true)
-        string(defaultValue: 'prod', description: 'Argument for shell command PROD stand', name: 'shell_param_prod', trim: true)
-    }
+    // AGENT по умолчанию лежит в функции
+    // parameters {
+    //    string(name: 'AGENT', defaultValue: 'cms-netbox-dev', description: 'Agent (host, computer) where runs groovy', trim: true)
+    // }
 
     stages {
         stage('Check gitlabTargetBranch') {
@@ -62,26 +79,25 @@ pipeline {
             steps {
                 script {
                     try {
-                        if (gitlabTargetBranch != null) {
-                            // классно, продолжаем работу
-                        } else {
+                        if (gitlabTargetBranch == null) {
+                            echo "gitlabTargetBranch = env.GIT_BRANCH"
                             gitlabTargetBranch = env.GIT_BRANCH
                         }
                     } catch (MissingPropertyException e) {
+                        echo "gitlabTargetBranch = env.GIT_BRANCH"
                         gitlabTargetBranch = env.GIT_BRANCH
                         }
+                    echo "Проверяем, что gitlabTargetBranch = ${gitlabTargetBranch}"
+                    AllowedBranchesAsList()
+                    echo "Содержится в списке, обозначенный как DEV: ${DEVELOPMENT_BRANCHES.join(';')}"
+                    echo "Или же в обозначенном как PROD: ${PROD_BRANCHES.join(';')}"
                     catchError(buildResult: 'ABORTED', stageResult: 'ABORTED') {
-                        def gitlabTargetBranch = gitlabTargetBranch.split("/")[-1]
-                        echo "Проверяем, что gitlabTargetBranch = ${gitlabTargetBranch}"
-                        AllowedBranchesAsList()
-                        echo "Содержится в списке, обозначенный как DEV: ${DEVELOPMENT_BRANCHES.join(';')}"
-                        echo "Или же в обозначенном как PROD: ${PROD_BRANCHES.join(';')}"
                         if (DEVELOPMENT_BRANCHES.contains(gitlabTargetBranch)) {
-                            def shell_param = params.get("shell_param_dev")
-                            echo 'Содержится в DEV'
+                            env.SHELL_PARAM = params.get("shell_param_dev")
+                            echo "Содержится в DEV, SHELL_PARAM = $SHELL_PARAM "
                         } else if (PROD_BRANCHES.contains(gitlabTargetBranch)) {
-                            def shell_param = params.get("shell_param_prod")
-                            echo 'Содержится в PROD'
+                            env.SHELL_PARAM = params.get("shell_param_prod")
+                            echo "Содержится в PROD, SHELL_PARAM = $SHELL_PARAM "
                         } else {
                             error('Прервано, т.к. Merge был произведен в другую ветвь')
                         }
@@ -91,15 +107,15 @@ pipeline {
         }
         stage('Push as commit New Version') {
             when {
-                expression {"${currentBuild.currentResult}" == 'SUCCESS'}
+                expression {"$currentBuild.currentResult" == 'SUCCESS'}
             }
             steps {
                 script {
-                    sh '''
+                    sh """
                         git fetch --all
-                        git switch ${gitlabTargetBranch}
-                        ./makeshell.sh push-commit-version ${shell_param}
-                    '''
+                        git switch $gitlabTargetBranch
+                        ./makeshell.sh push-commit-version $SHELL_PARAM
+                    """
                 }
             }
         }
@@ -109,9 +125,9 @@ pipeline {
             }
             steps {
                 script {
-                    sh '''
-                        ./makeshell.sh push-tag-version ${shell_param}
-                    '''
+                    sh """
+                        ./makeshell.sh push-tag-version $SHELL_PARAM
+                    """
                 }
             }
         }
