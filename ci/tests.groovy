@@ -1,3 +1,33 @@
+// Ссылка на issues по gitlab plugin
+// https://github.com/jenkinsci/gitlab-plugin/issues?q=is%3Aissue%20%20tag%20
+// Ссылка на триггеры
+// https://www.jenkins.io/doc/pipeline/steps/params/pipelinetriggers/
+// триггеры добавляются внутри pipeline, но они же заменяют триггеры установленные в Jenkins
+/*
+    triggers {
+        gitlab(
+            // trigger pipeline when push commits. IT DISABLE AND TAG_PUSH TOO!
+            triggerOnPush: false,
+            // trigger pipeline when create a mr
+            triggerOnMergeRequest: false,
+            triggerOpenMergeRequestOnPush: "never",
+            setBuildDescription: false,
+            // trigger pipeline when merge a mr
+            triggerOnAcceptedMergeRequest: true,
+            triggerOnPipelineEvent: false,
+            triggerOnClosedMergeRequest: false,
+            triggerOnApprovedMergeRequest: false,
+            // trigger pipeline when comment on open MR
+            addNoteOnMergeRequest: false,
+            triggerOnNoteRequest: false,
+            // trigger on target MR branch name
+            targetBranchRegex: 'Jenkins_ATOM-1095',
+        )
+    }
+*/
+// pipeline generator
+// https://jenkinspipelinegenerator.octopus.com/#/
+
 // Глобальная функция для получения списка разрешенных веток
 def AllowedBranchesAsList() {
     // return DEVELOPMENT_BRANCHES.split(',').collect { it.trim() }
@@ -232,6 +262,15 @@ pipeline {
             }
             steps {
                 script {
+                    // Это если мы хотим чтоб Jenkins зашел в подпапку subfolder. Он ее создаст если ее нет
+                    // dir ("subfolder"){sh "rm -rf ."}
+                    // Помещает конфиг файл в targetLocation
+                    // Если targetLocation не существует - будет ошибка
+                    /* 
+                    configFileProvider([
+                        configFile(fileId: "NetBoxAtom_.env.${STAND}", targetLocation: './.env.dev'),
+                        ]){} // в {} производятся экшены
+                    */
                     catchError(buildResult: 'ABORTED', stageResult: 'ABORTED') {
                         if (1==1) {
                             error('Next прерван, выполнение остановлено.')

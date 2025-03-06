@@ -95,6 +95,15 @@ pipeline {
                         if (DEVELOPMENT_BRANCHES.contains(gitlabTargetBranch)) {
                             env.SHELL_PARAM = params.get("shell_param_dev")
                             echo "Содержится в DEV, SHELL_PARAM = $SHELL_PARAM "
+                            // Это если мы хотим чтоб Jenkins зашел в подпапку subfolder. Он ее создаст если ее нет
+                            // dir ("subfolder"){sh "rm -rf ."}
+                            // Помещает конфиг файл в targetLocation
+                            // Если targetLocation не существует - будет ошибка
+                            /* 
+                            configFileProvider([
+                                configFile(fileId: "NetBoxAtom_.env.${STAND}", targetLocation: './.env.dev'),
+                                ]){} // в {} производятся экшены
+                            */
                         } else if (PROD_BRANCHES.contains(gitlabTargetBranch)) {
                             env.SHELL_PARAM = params.get("shell_param_prod")
                             echo "Содержится в PROD, SHELL_PARAM = $SHELL_PARAM "
