@@ -1,33 +1,3 @@
-// Ссылка на issues по gitlab plugin
-// https://github.com/jenkinsci/gitlab-plugin/issues?q=is%3Aissue%20%20tag%20
-// Ссылка на триггеры
-// https://www.jenkins.io/doc/pipeline/steps/params/pipelinetriggers/
-// триггеры добавляются внутри pipeline, но они же заменяют триггеры установленные в Jenkins
-/*
-    triggers {
-        gitlab(
-            // trigger pipeline when push commits. IT DISABLE AND TAG_PUSH TOO!
-            triggerOnPush: false,
-            // trigger pipeline when create a mr
-            triggerOnMergeRequest: false,
-            triggerOpenMergeRequestOnPush: "never",
-            setBuildDescription: false,
-            // trigger pipeline when merge a mr
-            triggerOnAcceptedMergeRequest: true,
-            triggerOnPipelineEvent: false,
-            triggerOnClosedMergeRequest: false,
-            triggerOnApprovedMergeRequest: false,
-            // trigger pipeline when comment on open MR
-            addNoteOnMergeRequest: false,
-            triggerOnNoteRequest: false,
-            // trigger on target MR branch name
-            targetBranchRegex: 'Jenkins_ATOM-1095',
-        )
-    }
-*/
-// pipeline generator
-// https://jenkinspipelinegenerator.octopus.com/#/
-
 // Глобальная функция для получения списка разрешенных веток
 def AllowedBranchesAsList() {
     // return DEVELOPMENT_BRANCHES.split(',').collect { it.trim() }
@@ -124,27 +94,27 @@ pipeline {
                     // So not changed
                     //env.TRY_TO_CHANGE_ME = 'CHANGED_VALUE'
                     TRY_TO_CHANGE_ME = 'CHANGED_VALUE' // yes, it change and you must use without env. prefix
-                    echo "env.TRY_TO_CHANGE_ME = ${env.TRY_TO_CHANGE_ME}" // DEFAULT_VALUE
+                    echo "env.TRY_TO_CHANGE_ME = ${env.TRY_TO_CHANGE_ME}" // val from ENV
                     echo "TRY_TO_CHANGE_ME = ${TRY_TO_CHANGE_ME}" // CHANGED_VALUE
                     echo "Try create global env GLOBAL_ENV_BREAK with value from param Enable_Breake_Stage"
-                    GLOBAL_ENV_BREAK="${params.get('Enable_Breake_Stage')}" // YES
-                    echo "GLOBAL_ENV_BREAK is ${GLOBAL_ENV_BREAK}" // YES
+                    GLOBAL_ENV_BREAK="${params.get('Enable_Breake_Stage')}" // val from PARAM
+                    echo "GLOBAL_ENV_BREAK is ${GLOBAL_ENV_BREAK}" // val from PARAM
                     ONE_MORE_WAY_TO_GET_FROM_PARAM = "$params.get('Enable_Breake_Stage')"
-                    echo "$ONE_MORE_WAY_TO_GET_FROM_PARAM" // null('Enable_Breake_Stage')
+                    echo "$ONE_MORE_WAY_TO_GET_FROM_PARAM" // output: null('Enable_Breake_Stage')
                     ONE_MORE_WAY_TO_GET_FROM_PARAM = Enable_Breake_Stage
-                    echo "$ONE_MORE_WAY_TO_GET_FROM_PARAM" // YES
+                    echo "$ONE_MORE_WAY_TO_GET_FROM_PARAM" // val from PARAM
                     ONE_MORE_WAY_TO_GET_FROM_PARAM = '${params.get("Enable_Breake_Stage")}'
-                    echo "$ONE_MORE_WAY_TO_GET_FROM_PARAM" // printed as is
+                    echo "$ONE_MORE_WAY_TO_GET_FROM_PARAM" // PRINT AS IS
                     echo "Try to create env DEV_SREDA with value from variable shell_param_dev"
-                    DEV_SREDA = "${shell_param_dev}" // dev
-                    echo "${DEV_SREDA}" // dev
-                    echo "Original value shell_param_dev is ${shell_param_dev}" // dev
+                    DEV_SREDA = "${shell_param_dev}" // val from VAR
+                    echo "${DEV_SREDA}" // val from VAR
+                    echo "Original value shell_param_dev is ${shell_param_dev}" // val from VAR
                     echo "Print env.NOT_EXISTS env: ${env.NOT_EXISTS}" // output: null
-                    echo """echo 'Содержится в DEV, SHELL_PARAM = "${DEV_SREDA}" ' """ // in echo DEV_SREDA changes
+                    echo """echo 'Содержится в DEV, SHELL_PARAM = "${DEV_SREDA}" ' """ // val from VAR
                     echo 'Содержится в DEV, SHELL_PARAM = "${DEV_SREDA}" // one quote' // PRINT AS IS
-                    echo """echo "Содержится в DEV, SHELL_PARAM = '${DEV_SREDA}' " // changed quotes""" // in echo DEV_SREDA changes
-                    echo "Содержится в DEV, SHELL_PARAM = '${DEV_SREDA}' " // in echo DEV_SREDA changes
-                    echo "That's works: $DEV_SREDA"
+                    echo """echo "Содержится в DEV, SHELL_PARAM = '${DEV_SREDA}' " // changed quotes""" // val from VAR
+                    echo "Содержится в DEV, SHELL_PARAM = '${DEV_SREDA}' " // val from VAR
+                    echo "That's works: $DEV_SREDA" // val from VAR
                     sh '''
                         echo 'sh command'
                         echo 'DEV_SREDA IS ${DEV_SREDA}'
@@ -167,8 +137,8 @@ pipeline {
                     echo "We added env CHANGE_ME_VIA_ENVIRONMENTS, check that value changed: $CHANGE_ME_VIA_ENVIRONMENTS" // CHANGED_VALUE, but not forever
                     echo sh(script: 'env|sort', returnStdout: true)
                     // Если внутри shell скрипта env переопределяется, то оно и будет использоваться (переопределенное)
-                    echo "makeshell.sh print-tenant"
-                    sh "./makeshell.sh print-tenant" // выведет содержимое .env.example
+                    echo "makeshell.sh debug"
+                    sh "./makeshell.sh debug" // выведет содержимое .env.example
                     echo "From env Enable_Breake_Stage: $env.Enable_Breake_Stage" // like in ENV
                     echo "From param: Enable_Breake_Stage:  $params.Enable_Breake_Stage" // like in params
                     echo "Just Enable_Breake_Stage: $Enable_Breake_Stage" // like in ENV (!!!) ENV UPPER THAN PARAMS (!!!)
@@ -262,15 +232,6 @@ pipeline {
             }
             steps {
                 script {
-                    // Это если мы хотим чтоб Jenkins зашел в подпапку subfolder. Он ее создаст если ее нет
-                    // dir ("subfolder"){sh "rm -rf ."}
-                    // Помещает конфиг файл в targetLocation
-                    // Если targetLocation не существует - будет ошибка
-                    /* 
-                    configFileProvider([
-                        configFile(fileId: "NetBoxAtom_.env.${STAND}", targetLocation: './.env.dev'),
-                        ]){} // в {} производятся экшены
-                    */
                     catchError(buildResult: 'ABORTED', stageResult: 'ABORTED') {
                         if (1==1) {
                             error('Next прерван, выполнение остановлено.')
