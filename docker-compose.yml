@@ -5,7 +5,7 @@ x-app: &default-app
     - cicd_network
   environment:
     - TZ="Europe/Moscow"
-  restart: on-failure:5
+  restart: on-failure:2
   stop_grace_period: "3s"
   healthcheck:
     test: ["CMD", "true"]
@@ -15,6 +15,8 @@ x-app: &default-app
     start_period: 10s
 
 services:
+
+#MARK: jenkins
   jenkins:
     <<: *default-app
     image: jenkins/jenkins:2.452.1-jdk17
@@ -29,6 +31,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
 
+#MARK: redis
   redis:
     <<: *default-app
     image: redis:7.4.2
@@ -39,27 +42,26 @@ services:
       - redis-data:/data:Z
 
 
+#MARK: postgresql
   postgresql:
     <<: *default-app
-    image: postgres:14.17
+    image: postgres:17.4
     container_name: cicd_postgresql
-    command:
-      - --loglevel warning
     volumes:
       - postgresql-data:/var/lib/postgresql:Z
     ports:
       - "${POSTGRESQL_PUBLIC_PORT}:5432"
     environment:
       - TZ="Europe/Moscow"
-      - DB_USER
-      - DB_PASS
-      - DB_NAME
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_DB=${DB_NAME}
       - DB_EXTENSION=pg_trgm,btree_gist
 
 
+#MARK: gitlab
   gitlab:
     <<: *default-app
-    restart: always
     image: gitlab/gitlab-ce:17.8.4-ce.0
     depends_on:
       - redis
@@ -200,7 +202,10 @@ services:
       - OAUTH_AZURE_API_SECRET=
       - OAUTH_AZURE_TENANT_ID=
 
+
+#MARK: ansible
   ansible:
+    <<: *default-app
     image: python:3.10
     container_name: ansible-${TENANT}
     volumes:
